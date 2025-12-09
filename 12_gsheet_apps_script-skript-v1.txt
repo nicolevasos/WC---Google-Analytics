@@ -1,0 +1,37 @@
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+  var range = sheet.getRange("A2:E"); /* Set your own range of columns */
+  var values = range.getValues();
+  
+  var base_object = {
+    "type": "FeatureCollection",
+    "features": []
+  };
+  for(var i=0;i<values.length;i++){ /* this adds a feature for every row of values */
+    if(values[i][4] === 1){ /* This checks the value of the E column, 
+    if it's 1 then the values from the row are added*/
+      var feature = {
+      "type": "Feature",
+      "properties": { /* Set the properties you will want to get back*/
+        "time": values[i][0], /* the index for the values starts at 0, 
+
+                   meaning that "values[i][0]" returns the value from column A for the row */ 
+        "type": values[i][1] 
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          values[i][2],
+          values[i][3]
+        ]
+      }
+    };
+    base_object.features.push(feature);
+    }
+    
+  }
+
+  var response = ContentService.createTextOutput(JSON.stringify( base_object));
+  response.setMimeType(ContentService.MimeType.JSON);
+  return response;  
+}
